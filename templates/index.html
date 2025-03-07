@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Agent Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Marked.js for markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --tcs-blue: #0D1F52;
+            --tcs-purple: #5A2D81;
+            --tcs-magenta: #E31B72;
+            --tcs-gray: #F5F7FA;
+            --primary-gradient: linear-gradient(135deg, #0D1F52, #5A2D81, #E31B72);
+            --secondary-gradient: linear-gradient(135deg, #5A2D81, #E31B72);
+            --hover-gradient: linear-gradient(135deg, #0D1F52, #5A2D81);
+        }
+        
+        body {
+            background-color: var(--tcs-gray);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #2C2C2C;
+        }
+        
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(13, 31, 82, 0.08);
+            border-radius: 12px;
+            border: none;
+            background: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            font-weight: 600;
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 18px 24px;
+            border: none;
+            letter-spacing: 0.5px;
+        }
+        
+        .bg-finance {
+            background: var(--primary-gradient);
+        }
+        
+        .btn-primary {
+            background: var(--secondary-gradient);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background: var(--hover-gradient);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(90, 45, 129, 0.2);
+        }
+        
+        .btn-outline-secondary {
+            border: 2px solid var(--tcs-purple);
+            color: var(--tcs-purple);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: var(--secondary-gradient);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .form-select, .form-control {
+            border-radius: 8px;
+            border: 2px solid #E5E9F2;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-select:focus, .form-control:focus {
+            border-color: var(--tcs-purple);
+            box-shadow: 0 0 0 0.25rem rgba(90, 45, 129, 0.15);
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin: 0 4px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .result-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 24px;
+            border-radius: 8px;
+            background: var(--tcs-gray);
+            margin-top: 20px;
+            border: none;
+            box-shadow: inset 0 2px 4px rgba(13, 31, 82, 0.05);
+        }
+        
+        .feature-icon {
+            color: var(--tcs-magenta);
+            margin-right: 8px;
+        }
+        
+        /* Update scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--tcs-gray);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--tcs-purple), var(--tcs-magenta));
+            border-radius: 4px;
+        }
+        
+        /* Additional alignment improvements */
+        .container-fluid {
+            padding: 32px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .card-body {
+            padding: 24px;
+        }
+        
+        .ticker-form {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        section {
+            margin-bottom: 32px;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #fff, rgba(255,255,255,0.85));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg bg-finance">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="fas fa-chart-line"></i> Finance Agent Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#stock-price-section">Stock Prices</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#analyst-recommendations-section">Analyst Recommendations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#company-info-section">Company Info</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#company-news-section">Company News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#custom-analysis-section">Custom Analysis</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/stocks">Available Stocks</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Sidebar with Quick Access -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">Quick Analysis</div>
+                    <div class="card-body">
+                        <form id="quick-ticker-form">
+                            <div class="mb-3">
+                                <label for="quick-ticker" class="form-label">Select Stock Ticker</label>
+                                <select class="form-select" id="quick-ticker">
+                                    <option value="">Select a stock...</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary w-100 mb-2" id="analyze-all-btn">Analyze All Features</button>
+                            <p class="text-muted small">This will run all 4 analysis features for the given ticker.</p>
+                        </form>
+                        
+                        <hr>
+                        
+                        <div class="popular-tickers mt-3">
+                            <h6>Popular Tickers</h6>
+                            <div class="d-flex flex-wrap">
+                                <button class="btn btn-sm btn-outline-secondary m-1 popular-ticker-btn" data-ticker="AAPL">AAPL</button>
+                                <button class="btn btn-sm btn-outline-secondary m-1 popular-ticker-btn" data-ticker="MSFT">MSFT</button>
+                                <button class="btn btn-sm btn-outline-secondary m-1 popular-ticker-btn" data-ticker="GOOGL">GOOGL</button>
+                                <button class="btn btn-sm btn-outline-secondary m-1 popular-ticker-btn" data-ticker="AMZN">AMZN</button>
+                                <button class="btn btn-sm btn-outline-secondary m-1 popular-ticker-btn" data-ticker="NVDA">NVDA</button>
+                                <button class="btn btn-sm btn-outline-secondary m-1 popular-ticker-btn" data-ticker="TSLA">TSLA</button>
+                                <button class="btn btn-sm btn-outline-secondary m-1 popular-ticker-btn" data-ticker="META">META</button>
+                                <button class="btn btn-sm btn-outline-secondary m-1 popular-ticker-btn" data-ticker="BRK-B">BRK-B</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">About</div>
+                    <div class="card-body">
+                        <p>This Finance Agent Dashboard provides detailed financial analysis powered by:</p>
+                        <ul>
+                            <li>Phi Agent with Google Gemini</li>
+                            <li>YFinance data tools</li>
+                            <li>Flask backend</li>
+                            <li>Bootstrap & JavaScript frontend</li>
+                        </ul>
+                        <p class="text-muted small">Note: All data is for informational purposes only and should not be considered financial advice.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="col-md-9">
+                <!-- Stock Price Section -->
+                <section id="stock-price-section" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line feature-icon"></i>Stock Price Analysis
+                        </div>
+                        <div class="card-body">
+                            <form class="ticker-form" id="stock-price-form">
+                                <select class="form-select ticker-input" id="stock-price-ticker">
+                                    <option value="">Select a stock...</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                                <button type="submit" class="btn btn-primary">Analyze</button>
+                            </form>
+                            <div class="loader" id="stock-price-loader"></div>
+                            <div class="result-container" id="stock-price-result"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Analyst Recommendations Section -->
+                <section id="analyst-recommendations-section" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-user-tie feature-icon"></i>Analyst Recommendations
+                        </div>
+                        <div class="card-body">
+                            <form class="ticker-form" id="analyst-recommendations-form">
+                                <select class="form-select ticker-input" id="analyst-recommendations-ticker">
+                                    <option value="">Select a stock...</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                                <button type="submit" class="btn btn-primary">Analyze</button>
+                            </form>
+                            <div class="loader" id="analyst-recommendations-loader"></div>
+                            <div class="result-container" id="analyst-recommendations-result"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Company Info Section -->
+                <section id="company-info-section" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-building feature-icon"></i>Company Information
+                        </div>
+                        <div class="card-body">
+                            <form class="ticker-form" id="company-info-form">
+                                <select class="form-select ticker-input" id="company-info-ticker">
+                                    <option value="">Select a stock...</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                                <button type="submit" class="btn btn-primary">Analyze</button>
+                            </form>
+                            <div class="loader" id="company-info-loader"></div>
+                            <div class="result-container" id="company-info-result"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Company News Section -->
+                <section id="company-news-section" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-newspaper feature-icon"></i>Company News
+                        </div>
+                        <div class="card-body">
+                            <form class="ticker-form" id="company-news-form">
+                                <select class="form-select ticker-input" id="company-news-ticker">
+                                    <option value="">Select a stock...</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                                <button type="submit" class="btn btn-primary">Analyze</button>
+                            </form>
+                            <div class="loader" id="company-news-loader"></div>
+                            <div class="result-container" id="company-news-result"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Custom Analysis Section -->
+                <section id="custom-analysis-section" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-robot feature-icon"></i>Custom Financial Analysis
+                        </div>
+                        <div class="card-body">
+                            <form id="custom-analysis-form">
+                                <div class="mb-3">
+                                    <label for="custom-prompt" class="form-label">Enter your custom analysis request</label>
+                                    <div class="example-queries mb-2">
+                                        <small class="text-muted">Example queries:</small>
+                                        <div class="query-examples">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary me-2 mb-2 example-query">
+                                                Compare AAPL and MSFT performance over the last 6 months and analyze their strengths
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary me-2 mb-2 example-query">
+                                                Analyze the financial health and growth potential of NVDA in the AI market
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary me-2 mb-2 example-query">
+                                                Show me the top tech stocks with highest revenue growth in last quarter
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <textarea class="form-control" id="custom-prompt" rows="3" placeholder="Type your analysis request or click an example above..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Run Analysis</button>
+                            </form>
+                            <div class="loader" id="custom-analysis-loader"></div>
+                            <div class="result-container" id="custom-analysis-result"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap and jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

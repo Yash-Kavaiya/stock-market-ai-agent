@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Stocks - Finance Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --tcs-blue: #0D1F52;
+            --tcs-purple: #5A2D81;
+            --tcs-magenta: #E31B72;
+            --tcs-gray: #F5F7FA;
+            --primary-gradient: linear-gradient(135deg, #0D1F52, #5A2D81, #E31B72);
+            --secondary-gradient: linear-gradient(135deg, #5A2D81, #E31B72);
+            --hover-gradient: linear-gradient(135deg, #0D1F52, #5A2D81);
+        }
+        
+        body {
+            background-color: var(--tcs-gray);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #2C2C2C;
+        }
+        
+        .card {
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(13, 31, 82, 0.08);
+            border-radius: 12px;
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            font-weight: 600;
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 8px 8px 0 0 !important;
+            padding: 15px 20px;
+        }
+        
+        .bg-finance {
+            background: var(--primary-gradient);
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 12px 20px;
+            border-radius: 4px;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .stock-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 8px 0;
+            background: white;
+            border: 2px solid #E5E9F2;
+        }
+        
+        .stock-item:hover {
+            background: var(--hover-gradient);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13, 31, 82, 0.15);
+        }
+        
+        .search-box {
+            margin: 32px 0;
+        }
+        
+        .search-box input {
+            border-radius: 12px;
+            padding: 16px 24px;
+            border: 2px solid #E5E9F2;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(13, 31, 82, 0.05);
+        }
+        
+        .search-box input:focus {
+            border-color: var(--tcs-purple);
+            box-shadow: 0 4px 12px rgba(90, 45, 129, 0.15);
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: white !important;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Additional alignment improvements */
+        .container {
+            padding: 32px 24px;
+            max-width: 1400px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        h1 {
+            color: var(--tcs-blue);
+            font-weight: 600;
+            margin-bottom: 32px;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg bg-finance">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/"><i class="fas fa-chart-line"></i> Finance Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/stocks">Stock List</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <h1 class="mb-4">Available Stocks</h1>
+        
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="search-box">
+                    <input type="text" id="search-input" class="form-control form-control-lg" placeholder="Search for a stock by ticker or name...">
+                </div>
+            </div>
+        </div>
+        
+        <div class="row" id="stock-container">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">Loading Stock Data...</div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Stock List Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch the stock list
+            fetch('/api/get_stock_list')
+                .then(response => response.json())
+                .then(data => {
+                    displayStocks(data);
+                    setupSearch(data);
+                })
+                .catch(error => {
+                    document.getElementById('stock-container').innerHTML = `
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header text-white bg-danger">Error</div>
+                                <div class="card-body">
+                                    <p>Failed to load stock data: ${error.message}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+        });
+        
+        function displayStocks(stockData) {
+            const container = document.getElementById('stock-container');
+            container.innerHTML = '';
+            
+            // Loop through each sector
+            for (const sector in stockData) {
+                const sectorStocks = stockData[sector];
+                
+                // Create a card for each sector
+                const sectorCard = document.createElement('div');
+                sectorCard.className = 'col-md-6 mb-4';
+                sectorCard.innerHTML = `
+                    <div class="card">
+                        <div class="card-header">${sector}</div>
+                        <div class="card-body">
+                            <div class="row" id="${sector.replace(/\s+/g, '-').toLowerCase()}-stocks"></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(sectorCard);
+                
+                const sectorStocksContainer = document.getElementById(`${sector.replace(/\s+/g, '-').toLowerCase()}-stocks`);
+                
+                // Add each stock in the sector
+                sectorStocks.forEach(stock => {
+                    const stockDiv = document.createElement('div');
+                    stockDiv.className = 'col-md-6';
+                    stockDiv.innerHTML = `
+                        <div class="stock-item" data-ticker="${stock.ticker}" data-name="${stock.name}">
+                            <strong>${stock.ticker}</strong>: ${stock.name}
+                        </div>
+                    `;
+                    sectorStocksContainer.appendChild(stockDiv);
+                    
+                    // Add click event to analyze the stock
+                    stockDiv.querySelector('.stock-item').addEventListener('click', function() {
+                        const ticker = this.getAttribute('data-ticker');
+                        window.location.href = `/?ticker=${ticker}`;
+                    });
+                });
+            }
+        }
+        
+        function setupSearch(stockData) {
+            const searchInput = document.getElementById('search-input');
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                let allStocks = [];
+                
+                // Flatten the stock data
+                for (const sector in stockData) {
+                    stockData[sector].forEach(stock => {
+                        stock.sector = sector;
+                        allStocks.push(stock);
+                    });
+                }
+                
+                if (searchTerm.length === 0) {
+                    // Show the original categorized view
+                    displayStocks(stockData);
+                    return;
+                }
+                
+                // Filter stocks based on search term
+                const filteredStocks = allStocks.filter(stock => 
+                    stock.ticker.toLowerCase().includes(searchTerm) || 
+                    stock.name.toLowerCase().includes(searchTerm)
+                );
+                
+                // Display search results
+                displaySearchResults(filteredStocks);
+            });
+        }
+        
+        function displaySearchResults(stocks) {
+            const container = document.getElementById('stock-container');
+            container.innerHTML = '';
+            
+            if (stocks.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">Search Results</div>
+                            <div class="card-body">
+                                <p>No stocks found matching your search.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create a card for search results
+            const resultsCard = document.createElement('div');
+            resultsCard.className = 'col-12';
+            resultsCard.innerHTML = `
+                <div class="card">
+                    <div class="card-header">Search Results (${stocks.length} stocks found)</div>
+                    <div class="card-body">
+                        <div class="row" id="search-results"></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(resultsCard);
+            
+            const resultsContainer = document.getElementById('search-results');
+            
+            // Add each stock in the results
+            stocks.forEach(stock => {
+                const stockDiv = document.createElement('div');
+                stockDiv.className = 'col-md-4 mb-2';
+                stockDiv.innerHTML = `
+                    <div class="stock-item" data-ticker="${stock.ticker}" data-name="${stock.name}">
+                        <strong>${stock.ticker}</strong>: ${stock.name}
+                        <br><small class="text-muted">Sector: ${stock.sector}</small>
+                    </div>
+                `;
+                resultsContainer.appendChild(stockDiv);
+                
+                // Add click event to analyze the stock
+                stockDiv.querySelector('.stock-item').addEventListener('click', function() {
+                    const ticker = this.getAttribute('data-ticker');
+                    window.location.href = `/?ticker=${ticker}`;
+                });
+            });
+        }
+    </script>
+</body>
+</html>

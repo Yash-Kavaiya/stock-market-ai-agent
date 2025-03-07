@@ -1,0 +1,7 @@
+flask==2.3.3
+phi-agent==0.2.0
+google-auth==2.26.1
+yfinance==0.2.35
+markdown==3.5.1
+markupsafe==2.1.3
+python-dotenv==1.0.0
