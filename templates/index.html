@@ -13,6 +13,7 @@
     <!-- Marked.js for markdown rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         :root {
             --tcs-blue: #0D1F52;
@@ -172,6 +173,23 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: 0.5px;
         }
+
+        /* Chart specific styles */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(13, 31, 82, 0.08);
+        }
+        
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
     </style>
 </head>
 <body>
@@ -186,6 +204,9 @@
                 <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link active" href="#stock-price-section">Stock Prices</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#chart-section">Charts</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#analyst-recommendations-section">Analyst Recommendations</a>
@@ -262,6 +283,42 @@
 
             <!-- Main Content Area -->
             <div class="col-md-9">
+                <!-- Price Chart Section -->
+                <section id="chart-section" class="mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-line feature-icon"></i>Price & Volume Charts
+                        </div>
+                        <div class="card-body">
+                            <form class="ticker-form" id="chart-form">
+                                <select class="form-select ticker-input" id="chart-ticker">
+                                    <option value="">Select a stock...</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Generate Charts</button>
+                            </form>
+                            
+                            <!-- Chart Containers -->
+                            <div class="row mt-4">
+                                <div class="col-12 mb-4">
+                                    <div class="chart-container">
+                                        <canvas id="priceChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-12 mb-4">
+                                    <div class="chart-container">
+                                        <canvas id="volumeChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="chart-container">
+                                        <canvas id="indicatorsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Stock Price Section -->
                 <section id="stock-price-section" class="mb-4">
                     <div class="card">

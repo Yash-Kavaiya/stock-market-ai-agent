@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
         setupQuickAnalysis();
         setupPopularTickers();
         
+        // Setup chart handlers
+        setupChartHandlers();
+        
         // Setup dropdown synchronization
         setupDropdownSync();
         
@@ -267,7 +270,8 @@ async function loadStockDropdowns() {
             document.getElementById('analyst-recommendations-ticker'),
             document.getElementById('company-info-ticker'),
             document.getElementById('company-news-ticker'),
-            document.getElementById('quick-ticker')
+            document.getElementById('quick-ticker'),
+            document.getElementById('chart-ticker')
         ];
         
         // Process the stock list
@@ -318,7 +322,8 @@ function setupDropdownSync() {
         document.getElementById('analyst-recommendations-ticker'),
         document.getElementById('company-info-ticker'),
         document.getElementById('company-news-ticker'),
-        document.getElementById('quick-ticker')
+        document.getElementById('quick-ticker'),
+        document.getElementById('chart-ticker')
     ];
     
     // Add change event listener to each dropdown
@@ -353,8 +358,130 @@ function checkUrlParameters() {
         document.getElementById('company-info-ticker').value = ticker;
         document.getElementById('company-news-ticker').value = ticker;
         document.getElementById('quick-ticker').value = ticker;
+        document.getElementById('chart-ticker').value = ticker;
         
         // Trigger the analyze all button
         document.getElementById('analyze-all-btn').click();
+    }
+}
+
+// Add new chart handling function
+function setupChartHandlers() {
+    const form = document.getElementById('chart-form');
+    const ticker = document.getElementById('chart-ticker');
+    
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        if (!ticker.value) {
+            alert('Please select a stock');
+            return;
+        }
+        
+        try {
+            // Fetch and render all charts
+            await Promise.all([
+                renderPriceChart(ticker.value),
+                renderVolumeChart(ticker.value),
+                renderIndicatorsChart(ticker.value)
+            ]);
+        } catch (error) {
+            console.error('Error generating charts:', error);
+            alert('Failed to generate charts. Please try again.');
+        }
+    });
+}
+
+async function renderPriceChart(ticker) {
+    try {
+        const response = await fetch('/api/get_price_trends', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticker })
+        });
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        
+        const canvas = document.getElementById('priceChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Clear existing chart
+        if (window.priceChart instanceof Chart) {
+            window.priceChart.destroy();
+        }
+        
+        // Create new chart with data
+        window.priceChart = new Chart(ctx, data.config);
+        
+    } catch (error) {
+        console.error('Error rendering price chart:', error);
+        alert('Failed to generate price chart: ' + error.message);
+    }
+}
+
+async function renderVolumeChart(ticker) {
+    try {
+        const response = await fetch('/api/get_volume_analysis', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticker })
+        });
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        
+        const canvas = document.getElementById('volumeChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Clear existing chart
+        if (window.volumeChart instanceof Chart) {
+            window.volumeChart.destroy();
+        }
+        
+        // Create new chart with data
+        window.volumeChart = new Chart(ctx, data.config);
+        
+    } catch (error) {
+        console.error('Error rendering volume chart:', error);
+        alert('Failed to generate volume chart: ' + error.message);
+    }
+}
+
+async function renderIndicatorsChart(ticker) {
+    try {
+        const response = await fetch('/api/get_technical_indicators', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticker })
+        });
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        
+        const canvas = document.getElementById('indicatorsChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Clear existing chart
+        if (window.indicatorsChart instanceof Chart) {
+            window.indicatorsChart.destroy();
+            delete window.indicatorsChart;
+        }
+        
+        // Create new chart with data
+        window.indicatorsChart = new Chart(ctx, data.config);
+        
+    } catch (error) {
+        console.error('Error rendering indicators chart:', error);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger';
+        errorDiv.textContent = 'Failed to generate technical indicators chart: ' + error.message;
+        document.getElementById('indicatorsChart').parentNode.appendChild(errorDiv);
     }
 }

@@ -620,5 +620,240 @@ def get_stock_list():
 def stock_list_page():
     return render_template('stock_list.html')
 
+@app.route('/api/get_price_trends', methods=['POST'])
+def get_price_trends():
+    data = request.json
+    ticker = data.get('ticker', '')
+    
+    try:
+        stock = yf.Ticker(ticker)
+        hist = stock.history(period="6mo")
+        
+        # Prepare data for chart
+        dates = hist.index.strftime('%Y-%m-%d').tolist()
+        prices = hist['Close'].tolist()
+        
+        config = {
+            'type': 'line',
+            'data': {
+                'labels': dates,
+                'datasets': [{
+                    'label': f'{ticker} Price',
+                    'data': prices,
+                    'borderColor': '#0066B3',
+                    'backgroundColor': 'rgba(0, 102, 179, 0.1)',
+                    'fill': True,
+                    'tension': 0.4
+                }]
+            },
+            'options': {
+                'responsive': True,
+                'maintainAspectRatio': False,
+                'interaction': {
+                    'intersect': False,
+                    'mode': 'index'
+                },
+                'plugins': {
+                    'title': {
+                        'display': True,
+                        'text': f'Price Trend - {ticker}'
+                    },
+                    'legend': {
+                        'position': 'top'
+                    }
+                },
+                'scales': {
+                    'y': {
+                        'beginAtZero': False,
+                        'grid': {
+                            'drawBorder': False
+                        }
+                    },
+                    'x': {
+                        'grid': {
+                            'display': False
+                        }
+                    }
+                }
+            }
+        }
+        
+        return jsonify({'config': config})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/get_volume_analysis', methods=['POST'])
+def get_volume_analysis():
+    data = request.json
+    ticker = data.get('ticker', '')
+    
+    try:
+        stock = yf.Ticker(ticker)
+        hist = stock.history(period="6mo")
+        
+        # Prepare data for chart
+        dates = hist.index.strftime('%Y-%m-%d').tolist()
+        volumes = hist['Volume'].tolist()
+        
+        config = {
+            'type': 'bar',
+            'data': {
+                'labels': dates,
+                'datasets': [{
+                    'label': f'{ticker} Volume',
+                    'data': volumes,
+                    'backgroundColor': 'rgba(90, 45, 129, 0.5)',
+                    'borderColor': '#5A2D81',
+                    'borderWidth': 1,
+                    'borderRadius': 4
+                }]
+            },
+            'options': {
+                'responsive': True,
+                'maintainAspectRatio': False,
+                'interaction': {
+                    'intersect': False,
+                    'mode': 'index'
+                },
+                'plugins': {
+                    'title': {
+                        'display': True,
+                        'text': f'Trading Volume - {ticker}'
+                    },
+                    'legend': {
+                        'position': 'top'
+                    }
+                },
+                'scales': {
+                    'y': {
+                        'beginAtZero': True,
+                        'grid': {
+                            'drawBorder': False
+                        }
+                    },
+                    'x': {
+                        'grid': {
+                            'display': False
+                        }
+                    }
+                }
+            }
+        }
+        
+        return jsonify({'config': config})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/get_technical_indicators', methods=['POST'])
+def get_technical_indicators():
+    data = request.json
+    ticker = data.get('ticker', '')
+    
+    try:
+        stock = yf.Ticker(ticker)
+        hist = stock.history(period="6mo")
+        
+        # Calculate simple moving averages
+        hist['SMA20'] = hist['Close'].rolling(window=20).mean()
+        hist['SMA50'] = hist['Close'].rolling(window=50).mean()
+        
+        # Prepare data for chart - replace NaN with None for JSON serialization
+        dates = hist.index.strftime('%Y-%m-%d').tolist()
+        prices = [float(x) if pd.notnull(x) else None for x in hist['Close']]
+        sma20 = [float(x) if pd.notnull(x) else None for x in hist['SMA20']]
+        sma50 = [float(x) if pd.notnull(x) else None for x in hist['SMA50']]
+        
+        config = {
+            'type': 'line',
+            'data': {
+                'labels': dates,
+                'datasets': [
+                    {
+                        'label': f'{ticker} Price',
+                        'data': prices,
+                        'borderColor': '#0D1F52',
+                        'backgroundColor': 'rgba(13, 31, 82, 0.1)',
+                        'fill': False,
+                        'tension': 0.4,
+                        'borderWidth': 2,
+                        'pointRadius': 0,
+                        'spanGaps': True
+                    },
+                    {
+                        'label': '20-day SMA',
+                        'data': sma20,
+                        'borderColor': '#E31B72',
+                        'backgroundColor': 'transparent',
+                        'borderDash': [5, 5],
+                        'borderWidth': 2,
+                        'pointRadius': 0,
+                        'fill': False,
+                        'spanGaps': True
+                    },
+                    {
+                        'label': '50-day SMA',
+                        'data': sma50,
+                        'borderColor': '#5A2D81',
+                        'backgroundColor': 'transparent',
+                        'borderDash': [10, 5],
+                        'borderWidth': 2,
+                        'pointRadius': 0,
+                        'fill': False,
+                        'spanGaps': True
+                    }
+                ]
+            },
+            'options': {
+                'responsive': True,
+                'maintainAspectRatio': False,
+                'interaction': {
+                    'intersect': False,
+                    'mode': 'index'
+                },
+                'plugins': {
+                    'title': {
+                        'display': True,
+                        'text': f'Technical Analysis - {ticker}'
+                    },
+                    'legend': {
+                        'position': 'top',
+                        'labels': {
+                            'usePointStyle': True,
+                            'padding': 15
+                        }
+                    },
+                    'tooltip': {
+                        'mode': 'index',
+                        'intersect': False
+                    }
+                },
+                'scales': {
+                    'y': {
+                        'beginAtZero': False,
+                        'grid': {
+                            'drawBorder': False,
+                            'color': 'rgba(0, 0, 0, 0.05)'
+                        },
+                        'ticks': {
+                            'padding': 10
+                        }
+                    },
+                    'x': {
+                        'grid': {
+                            'display': False
+                        },
+                        'ticks': {
+                            'maxTicksLimit': 10,
+                            'maxRotation': 0
+                        }
+                    }
+                }
+            }
+        }
+        
+        return jsonify({'config': config})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
