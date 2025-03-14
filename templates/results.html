@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}Product Recommendations{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h2 class="mb-0"><i class="fas fa-list-alt me-2"></i>Product Recommendations</h2>
+                <a href="{{ url_for('index') }}" class="btn btn-light">
+                    <i class="fas fa-search me-1"></i> New Search
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="search-summary mb-4">
+                    <h4><i class="fas fa-filter me-2"></i>Search Criteria</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 30%">Category</th>
+                                    <td>{{ search_data.category|replace('_', ' ')|title }}</td>
+                                </tr>
+                                {% if search_data.specific_item %}
+                                <tr>
+                                    <th>Specific Item</th>
+                                    <td>{{ search_data.specific_item }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <th>Budget Range</th>
+                                    <td>
+                                        {% if search_data.budget == '0-1000' %}
+                                            Under ₹1,000
+                                        {% elif search_data.budget == '1000-5000' %}
+                                            ₹1,000 - ₹5,000
+                                        {% elif search_data.budget == '5000-10000' %}
+                                            ₹5,000 - ₹10,000
+                                        {% elif search_data.budget == '10000-20000' %}
+                                            ₹10,000 - ₹20,000
+                                        {% elif search_data.budget == '20000-50000' %}
+                                            ₹20,000 - ₹50,000
+                                        {% elif search_data.budget == '50000+' %}
+                                            Above ₹50,000
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if search_data.brand and search_data.brand != '' %}
+                                <tr>
+                                    <th>Preferred Brand</th>
+                                    <td>{{ search_data.brand|title }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if search_data.preferences %}
+                                <tr>
+                                    <th>Preferences</th>
+                                    <td>
+                                        {% for pref in search_data.preferences %}
+                                            <span class="badge bg-info text-dark me-1">{{ pref|replace('_', ' ')|title }}</span>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% if search_data.additional_info %}
+                                <tr>
+                                    <th>Additional Requirements</th>
+                                    <td>{{ search_data.additional_info }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="search-query mb-4">
+                    <h4><i class="fas fa-comment-alt me-2"></i>Query Sent to AI</h4>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <p class="mb-0"><em>{{ query }}</em></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recommendations">
+                    <h4><i class="fas fa-shopping-bag me-2"></i>Recommended Products</h4>
+                    
+                    <div class="loading-spinner text-center d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Searching for products... This may take a moment.</p>
+                    </div>
+                    
+                    <div class="results-content">
+                        {% if recommendations and not (recommendations|trim|lower).startswith('error') %}
+                            {% if 'regret to inform you' in recommendations|lower or 'could not find' in recommendations|lower or 'no products' in recommendations|lower %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>No Products Found:</strong> {{ recommendations|safe }}
+                                    
+                                    <div class="mt-3">
+                                        <h5>Suggestions:</h5>
+                                        <ul>
+                                            <li>Try increasing your budget range</li>
+                                            <li>Remove some preferences to get more results</li>
+                                            <li>Try a different product category or brand</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="markdown-content">
+                                    {{ recommendations|safe }}
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Error:</strong> {{ recommendations|default('Unable to get recommendations at this time. Please try again later.') }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Parse and format markdown content
+        function renderMarkdown() {
+            let content = $('.markdown-content').html();
+            
+            // Convert markdown links if any
+            content = content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+            
+            // Convert markdown headings
+            content = content.replace(/^### (.*$)/gm, '<h5>$1</h5>');
+            content = content.replace(/^## (.*$)/gm, '<h4>$1</h4>');
+            content = content.replace(/^# (.*$)/gm, '<h3>$1</h3>');
+            
+            // Convert markdown lists
+            content = content.replace(/^\* (.*$)/gm, '<li>$1</li>');
+            content = content.replace(/<li>(.*)<\/li>/g, '<ul><li>$1</li></ul>');
+            
+            // Bold and italic
+            content = content.replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>');
+            content = content.replace(/\*(.*)\*/g, '<em>$1</em>');
+            
+            // Line breaks
+            content = content.replace(/\n/g, '<br>');
+            
+            $('.markdown-content').html(content);
+        }
+        
+        // Detect product cards in the content and format them
+        function formatProductCards() {
+            const content = $('.markdown-content').html();
+            let formattedContent = content;
+            
+            // Look for product patterns like "Product Name - $XX.XX"
+            const productPattern = /([^<>]+)(\s*-\s*)(₹|Rs\.|INR|\$)(\s*)([0-9,]+(\.[0-9]{2})?)/g;
+            
+            formattedContent = formattedContent.replace(productPattern, function(match, name, separator, currency, space, price) {
+                return `<div class="card product-card mb-3">
+                          <div class="card-body">
+                            <h5 class="card-title">${name.trim()}</h5>
+                            <p class="card-text price-tag">${currency}${price}</p>
+                          </div>
+                        </div>`;
+            });
+            
+            $('.markdown-content').html(formattedContent);
+        }
+        
+        // Render the markdown content
+        renderMarkdown();
+        
+        // Try to format product cards
+        formatProductCards();
+    });
+</script>
+{% endblock %}
