@@ -1,6 +1,11 @@
 from phi.agent import Agent
 from phi.model.google import Gemini
 from phi.tools.firecrawl import FirecrawlTools
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 agent = Agent(
     name="shopping partner",
@@ -14,7 +19,7 @@ agent = Agent(
         "Clearly mention the key attributes of each product (e.g., price, brand, features) in the response.",
         "Format the recommendations neatly and ensure clarity for ease of user understanding.",
     ],
-    tools=[FirecrawlTools()],
+    tools=[FirecrawlTools(api_key=os.getenv('FIRECRAWL_API_KEY'))],
 )
 agent.print_response(
     "I am looking for running shoes with the following preferences: Color: Black Purpose: Comfortable for long-distance running Budget: Under Rs. 10,000"

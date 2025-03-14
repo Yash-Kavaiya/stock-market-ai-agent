@@ -1,0 +1,183 @@
+:root {
+    --primary-pink: #FF69B4;
+    --secondary-pink: #FFB6C1;
+    --accent-pink: #FF1493;
+    --gradient-pink: linear-gradient(135deg, #FF69B4, #FF1493);
+    --myntra-pink: #ee5f73;
+    --myntra-gradient: linear-gradient(to right, #ff3e6c, #ff71a1);
+}
+
+.navbar {
+    background: var(--gradient-pink) !important;
+}
+
+.card-header.bg-primary {
+    background: var(--gradient-pink) !important;
+}
+
+.btn-primary {
+    background: var(--myntra-gradient);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 30px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(238, 95, 115, 0.4);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--myntra-pink);
+    box-shadow: 0 0 0 0.25rem rgba(238, 95, 115, 0.15);
+}
+
+.select2-container--bootstrap-5 .select2-selection {
+    border-color: var(--secondary-pink);
+    border-radius: 12px !important;
+    border: 2px solid #eee !important;
+    min-height: 48px !important;
+}
+
+.product-card {
+    border: 2px solid #eee;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.product-card:hover {
+    border-color: var(--myntra-pink);
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(238, 95, 115, 0.15);
+}
+
+.alert-info {
+    background: linear-gradient(to right, #e8f4ff, #f5e6ff);
+    border-left: 5px solid var(--myntra-pink);
+}
+
+.card {
+    border-radius: 20px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.badge {
+    background: var(--myntra-gradient) !important;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.how-it-works i {
+    color: var(--primary-pink);
+    background: rgba(255, 105, 180, 0.1);
+    padding: 20px;
+    border-radius: 50%;
+}
+
+.footer {
+    background: linear-gradient(135deg, #FFF0F5, #FFE4E1) !important;
+}
+
+/* Form Elements Styling */
+.form-control, .form-select {
+    border-radius: 12px;
+    border: 2px solid #eee;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+    background: #fff;
+}
+
+/* Select2 Custom Styling */
+.select2-container--bootstrap-5 .select2-selection--single {
+    background: #fff !important;
+    padding: 8px 15px !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection--multiple {
+    padding: 5px 15px !important;
+}
+
+.select2-container--bootstrap-5 .select2-dropdown {
+    border-radius: 12px !important;
+    border: 2px solid var(--myntra-pink) !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.select2-container--bootstrap-5 .select2-results__option--highlighted {
+    background: var(--myntra-gradient) !important;
+}
+
+/* Form Label Styling */
+.form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+/* Placeholder Styling */
+::placeholder {
+    color: #999 !important;
+    font-size: 0.9rem;
+}
+
+/* Alert Styling */
+.alert {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Table Styling */
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table th {
+    background: rgba(238, 95, 115, 0.1);
+    font-weight: 600;
+    padding: 15px;
+}
+
+/* Loading Spinner */
+.spinner-border {
+    color: var(--myntra-pink) !important;
+}
+
+/* Price Tag Styling */
+.price-tag {
+    color: var(--myntra-pink);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Navbar Brand */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--myntra-gradient);
+    border-radius: 10px;
+}
