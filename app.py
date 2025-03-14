@@ -95,6 +95,30 @@ def create_app():
                                search_data=search_data,
                                query=query)
     
+    @app.route('/compare', methods=['POST'])
+    def compare_products():
+        """Compare selected products."""
+        products = request.form.getlist('compare_products[]')
+        if not products or len(products) < 2:
+            flash('Please select at least 2 products to compare.', 'error')
+            return redirect(url_for('results'))
+            
+        # Parse product information
+        parsed_products = []
+        for product in products:
+            try:
+                # Assuming product string format: "name|price|features"
+                name, price, *features = product.split('|')
+                parsed_products.append({
+                    'name': name,
+                    'price': price,
+                    'features': features[0].split(',') if features else []
+                })
+            except:
+                continue
+                
+        return render_template('compare.html', products=parsed_products)
+    
     return app
 
 
