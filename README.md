@@ -1,25 +1,27 @@
-# Stock Market AI Agent
+# 📈 Stock Market AI Agent
 
 An intelligent agent for analyzing stock market data, providing insights, and assisting with investment decisions.
 
-## Features
+## ✨ Features
 
-- **Real-time Market Data**: Access up-to-date stock prices and market indicators
-- **Technical Analysis**: Apply advanced algorithms for pattern recognition and trend analysis
-- **Sentiment Analysis**: Track market sentiment from news and social media
-- **Portfolio Management**: Get recommendations based on your investment goals
-- **Risk Assessment**: Evaluate potential risks and volatility in your investments
+- 🔄 **Real-time Market Data**: Access up-to-date stock prices and market indicators
+- 📊 **Technical Analysis**: Apply advanced algorithms for pattern recognition and trend analysis
+- 🔍 **Sentiment Analysis**: Track market sentiment from news and social media
+- 💼 **Portfolio Management**: Get recommendations based on your investment goals
+- ⚠️ **Risk Assessment**: Evaluate potential risks and volatility in your investments
 
-## Prerequisites
+## 🧰 Prerequisites
 
-1. [Python 3.8+](https://www.python.org/downloads/)
-2. [Docker](https://docs.docker.com/get-docker/) (for containerized deployment)
-3. API keys for market data providers
-4. Google Cloud account (for cloud deployment)
+| Requirement | Version | Purpose |
+|-------------|---------|---------|
+| [Python](https://www.python.org/downloads/) | 3.8+ | Core runtime environment |
+| [Docker](https://docs.docker.com/get-docker/) | Latest | Containerized deployment |
+| API Keys | Valid | Market data access |
+| Google Cloud | Account | Cloud deployment |
 
-## Getting Started
+## 🚀 Getting Started
 
-### Local Development Setup
+### 💻 Local Development Setup
 
 1. Clone the repository:
    ```bash
@@ -30,7 +32,7 @@ An intelligent agent for analyzing stock market data, providing insights, and as
 2. Create and activate a virtual environment:
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   source venv/bin/activate  # On Windows: venv\\Scripts\\activate
    ```
 
 3. Install dependencies:
@@ -52,7 +54,17 @@ An intelligent agent for analyzing stock market data, providing insights, and as
    flask run
    ```
 
-## Deploying to Google Cloud Run
+## ☁️ Deploying to Google Cloud Run
+
+### Deployment Workflow
+
+```mermaid
+graph TD
+    A[Build Docker Image] --> B[Test Locally]
+    B --> C[Push to GCR]
+    C --> D[Deploy to Cloud Run]
+    D --> E[Configure Environment]
+```
 
 ### Step 1: Add Gunicorn to requirements.txt
 
@@ -99,17 +111,19 @@ gcloud run deploy stock-market-ai-agent \
   --set-env-vars="ALPHA_VANTAGE_API_KEY=your_key,NEWS_API_KEY=your_key,SECRET_KEY=your_secret"
 ```
 
-## API Documentation
+## 📚 API Documentation
 
 The agent exposes several API endpoints:
 
-- `GET /api/stock/{symbol}` - Get current stock information
-- `GET /api/analysis/{symbol}` - Get technical analysis for a stock
-- `POST /api/portfolio/optimize` - Optimize portfolio allocation
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/stock/{symbol}` | GET | Get current stock information |
+| `/api/analysis/{symbol}` | GET | Get technical analysis for a stock |
+| `/api/portfolio/optimize` | POST | Optimize portfolio allocation |
 
 For detailed API documentation, see the [API Documentation](docs/api.md).
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 stock-market-ai-agent/
@@ -123,10 +137,10 @@ stock-market-ai-agent/
 └── README.md            # This file
 ```
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
+## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
