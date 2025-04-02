@@ -1,123 +1,132 @@
-# Deploying to Google Cloud Run
+# Stock Market AI Agent
 
-This guide walks you through deploying your Shopping Agent application to Google Cloud Run.
+An intelligent agent for analyzing stock market data, providing insights, and assisting with investment decisions.
+
+## Features
+
+- **Real-time Market Data**: Access up-to-date stock prices and market indicators
+- **Technical Analysis**: Apply advanced algorithms for pattern recognition and trend analysis
+- **Sentiment Analysis**: Track market sentiment from news and social media
+- **Portfolio Management**: Get recommendations based on your investment goals
+- **Risk Assessment**: Evaluate potential risks and volatility in your investments
 
 ## Prerequisites
 
-1. [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) installed
-2. Docker installed on your local machine
-3. Google Cloud project created
-4. Billing enabled on your Google Cloud project
-5. Required APIs enabled:
-   - Cloud Run API
-   - Container Registry API
-   - Cloud Build API
+1. [Python 3.8+](https://www.python.org/downloads/)
+2. [Docker](https://docs.docker.com/get-docker/) (for containerized deployment)
+3. API keys for market data providers
+4. Google Cloud account (for cloud deployment)
 
-## Step 1: Add Gunicorn to requirements.txt
+## Getting Started
 
-Ensure `gunicorn` is in your requirements.txt file as it's needed for production deployment:
+### Local Development Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Yash-Kavaiya/stock-market-ai-agent.git
+   cd stock-market-ai-agent
+   ```
+
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Set up environment variables:
+   ```bash
+   # Create a .env file with your API keys
+   ALPHA_VANTAGE_API_KEY=your_alpha_vantage_key
+   NEWS_API_KEY=your_news_api_key
+   SECRET_KEY=your_secret_key
+   FLASK_ENV=development
+   ```
+
+5. Run the application:
+   ```bash
+   flask run
+   ```
+
+## Deploying to Google Cloud Run
+
+### Step 1: Add Gunicorn to requirements.txt
+
+Ensure `gunicorn` is in your requirements.txt file for production deployment:
 
 ```bash
 echo "gunicorn==21.2.0" >> requirements.txt
 ```
 
-## Step 2: Setup Environment Variables
-
-Create a `.env` file with your API keys:
-
-```bash
-GOOGLE_API_KEY=your_google_api_key
-FIRECRAWL_API_KEY=your_firecrawl_api_key
-SECRET_KEY=your_secret_key
-FLASK_ENV=production
-```
-
-## Step 3: Build and Test Locally
+### Step 2: Build and Test Docker Container Locally
 
 ```bash
 # Build the Docker image
-docker build -t shopping-agent .
+docker build -t stock-market-ai-agent .
 
 # Run the container locally
-docker run -p 8080:8080 --env-file .env shopping-agent
+docker run -p 8080:8080 --env-file .env stock-market-ai-agent
 ```
 
 Visit http://localhost:8080 to test your application.
 
-## Step 4: Deploy to Google Cloud Run
-
-### Authenticate with Google Cloud
+### Step 3: Deploy to Google Cloud Run
 
 ```bash
+# Authenticate with Google Cloud
 gcloud auth login
-```
 
-### Configure Docker to use Google Container Registry
-
-```bash
+# Configure Docker to use Google Container Registry
 gcloud auth configure-docker
-```
 
-### Set your Google Cloud project ID
-
-```bash
+# Set your Google Cloud project ID
 gcloud config set project YOUR_PROJECT_ID
-```
 
-### Build and push the Docker image to Google Container Registry
+# Build and push the Docker image
+docker build -t gcr.io/YOUR_PROJECT_ID/stock-market-ai-agent .
+docker push gcr.io/YOUR_PROJECT_ID/stock-market-ai-agent
 
-```bash
-# Build and tag the image
-docker build -t gcr.io/YOUR_PROJECT_ID/shopping-agent .
-
-# Push the image to Google Container Registry
-docker push gcr.io/YOUR_PROJECT_ID/shopping-agent
-```
-
-### Deploy to Cloud Run
-
-```bash
-gcloud run deploy shopping-agent \
-  --image gcr.io/YOUR_PROJECT_ID/shopping-agent \
+# Deploy to Cloud Run
+gcloud run deploy stock-market-ai-agent \
+  --image gcr.io/YOUR_PROJECT_ID/stock-market-ai-agent \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \
-  --set-env-vars="GOOGLE_API_KEY=your_google_api_key,FIRECRAWL_API_KEY=your_firecrawl_api_key,SECRET_KEY=your_secret_key"
+  --set-env-vars="ALPHA_VANTAGE_API_KEY=your_key,NEWS_API_KEY=your_key,SECRET_KEY=your_secret"
 ```
 
-Replace `YOUR_PROJECT_ID` with your Google Cloud project ID and provide the actual values for your environment variables.
+## API Documentation
 
-## Step 5: Access Your Deployed Application
+The agent exposes several API endpoints:
 
-After the deployment completes, the command will output a URL for your deployed application, which looks like:
+- `GET /api/stock/{symbol}` - Get current stock information
+- `GET /api/analysis/{symbol}` - Get technical analysis for a stock
+- `POST /api/portfolio/optimize` - Optimize portfolio allocation
+
+For detailed API documentation, see the [API Documentation](docs/api.md).
+
+## Project Structure
 
 ```
-https://shopping-agent-xxxx-xx.a.run.app
+stock-market-ai-agent/
+├── api/                 # API routes and controllers
+├── models/              # Machine learning models
+├── services/            # External service integrations
+├── utils/               # Utility functions and helpers
+├── tests/               # Test suite
+├── Dockerfile           # Container definition
+├── requirements.txt     # Python dependencies
+└── README.md            # This file
 ```
 
-Visit this URL to access your application.
+## Contributing
 
-## Continuous Deployment (Optional)
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-To set up continuous deployment using Cloud Build:
+## License
 
-1. Connect your GitHub repository to Cloud Build
-2. Create a `cloudbuild.yaml` file in your repository
-3. Configure triggers for automatic builds
-
-For more information, see [Cloud Build documentation](https://cloud.google.com/build/docs/deploying-builds/deploy-cloud-run).
-
-## Monitoring and Logging
-
-Access logs and monitoring from the Google Cloud Console:
-- Logs: Cloud Run > shopping-agent > Logs
-- Metrics: Cloud Run > shopping-agent > Metrics
-
-## Troubleshooting
-
-If you encounter issues:
-
-1. Check container logs in the Cloud Run console
-2. Verify environment variables are correctly set
-3. Make sure all required APIs are enabled
-4. Ensure your service account has proper permissions
+This project is licensed under the MIT License - see the LICENSE file for details.
