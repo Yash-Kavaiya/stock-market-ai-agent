@@ -1,5 +1,7 @@
 # 🛍️ AI-Powered Shopping Partner
 
+> **Note**: This repository is named `stock-market-ai-agent` but contains a shopping recommendation system. The application provides intelligent product recommendations using AI.
+
 An intelligent shopping recommendation agent powered by Google's Gemini AI and web scraping capabilities. Get personalized product recommendations from trusted e-commerce platforms based on your preferences, budget, and requirements.
 
 ## ✨ Key Features
@@ -683,7 +685,6 @@ copies or substantial portions of the Software.
 |---------|------|---------|
 | 🐛 **Issues** | [GitHub Issues](https://github.com/Yash-Kavaiya/stock-market-ai-agent/issues) | Bug reports & feature requests |
 | 💬 **Discussions** | [GitHub Discussions](https://github.com/Yash-Kavaiya/stock-market-ai-agent/discussions) | Questions & community chat |
-| 📧 **Email** | [Contact](mailto:your.email@example.com) | Direct support |
 | 🌟 **Star** | [GitHub Star](https://github.com/Yash-Kavaiya/stock-market-ai-agent) | Show your support! |
 
 ---
