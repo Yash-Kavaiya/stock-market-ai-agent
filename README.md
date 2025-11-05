@@ -267,14 +267,14 @@ grep gunicorn requirements.txt
 
 ```bash
 # Build the Docker image
-docker build -t shopping-agent .
+docker build -t stock-market-ai-agent .
 
 # Run the container locally with environment variables
 docker run -p 8080:8080 \
   -e GOOGLE_API_KEY=your_google_api_key \
   -e FIRECRAWL_API_KEY=your_firecrawl_key \
   -e SECRET_KEY=your_secret_key \
-  shopping-agent
+  stock-market-ai-agent
 ```
 
 🌐 Visit `http://localhost:8080` to test your application.
@@ -296,14 +296,14 @@ gcloud services enable containerregistry.googleapis.com
 gcloud auth configure-docker
 
 # 5. Build and tag the Docker image
-docker build -t gcr.io/YOUR_PROJECT_ID/shopping-agent .
+docker build -t gcr.io/YOUR_PROJECT_ID/stock-market-ai-agent .
 
 # 6. Push the image to Google Container Registry
-docker push gcr.io/YOUR_PROJECT_ID/shopping-agent
+docker push gcr.io/YOUR_PROJECT_ID/stock-market-ai-agent
 
 # 7. Deploy to Cloud Run
-gcloud run deploy shopping-agent \
-  --image gcr.io/YOUR_PROJECT_ID/shopping-agent \
+gcloud run deploy stock-market-ai-agent \
+  --image gcr.io/YOUR_PROJECT_ID/stock-market-ai-agent \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \
@@ -353,7 +353,7 @@ gcloud secrets add-iam-policy-binding GOOGLE_API_KEY \
   --role="roles/secretmanager.secretAccessor"
 
 # Deploy with secrets
-gcloud run deploy shopping-agent \
+gcloud run deploy stock-market-ai-agent \
   --set-secrets="GOOGLE_API_KEY=GOOGLE_API_KEY:latest"
 ```
 
