@@ -135,8 +135,8 @@ flowchart TD
 |----------|-----------|---------|---------|
 | **AI/ML** | Google Gemini | 2.0 Flash Exp | AI-powered recommendations |
 | **Web Framework** | Flask | Latest | Web application server |
-| **Agent Framework** | Phi Data | 2.7.10+ | AI agent orchestration |
-| **Web Scraping** | Firecrawl | 1.13.5+ | Product data extraction |
+| **Agent Framework** | Phi Data | 2.7.10 | AI agent orchestration |
+| **Web Scraping** | Firecrawl | 1.13.5 | Product data extraction |
 | **Frontend** | Bootstrap | 5.x | Responsive UI design |
 | **Forms** | Flask-WTF | Latest | Form handling & validation |
 | **Production Server** | Gunicorn | 21.2.0 | WSGI HTTP server |
